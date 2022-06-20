@@ -1,0 +1,11 @@
+version: 1
+packages:
+  - path: "data"
+    name: "data"
+    sql_package: "pgx/v4"
+    engine: "postgresql"
+    schema:
+        - "database/migrations/20220618110438_create_todos_table.down.sql"
+        - "database/migrations/20220618110438_create_todos_table.up.sql"
+    queries:
+        - "database/queries/todo.sql"
