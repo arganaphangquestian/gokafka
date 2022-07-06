@@ -8,23 +8,28 @@ import (
 	kafka "github.com/segmentio/kafka-go"
 )
 
+var (
+	BROKERS = []string{"localhost:9092"}
+)
+
 const (
 	TOPIC     = "MESSAGE_TOPIC"
 	PARTITION = 0
 )
 
 func main() {
-	conn, err := kafka.DialLeader(context.Background(), "tcp", "localhost:9092", TOPIC, PARTITION)
-	if err != nil {
-		log.Fatal("failed to dial leader:", err)
-	}
+	conn := kafka.NewReader(kafka.ReaderConfig{
+		Brokers:   BROKERS,
+		Topic:     TOPIC,
+		Partition: PARTITION,
+	})
 	defer func() {
 		if err := conn.Close(); err != nil {
 			log.Fatal("failed to close writer:", err)
 		}
 	}()
 	for {
-		msg, err := conn.ReadMessage(10e3)
+		msg, err := conn.ReadMessage(context.Background())
 		if err != nil {
 			log.Println(err)
 		}
