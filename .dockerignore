@@ -1,8 +1,0 @@
-# Docker Compose
-docker-compose.yaml
-# Database Migrations + Queries
-database/
-# Environment Variable
-.env.example
-# Makefile
-Makefile
