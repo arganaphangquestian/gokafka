@@ -9,16 +9,21 @@ import (
 	kafka "github.com/segmentio/kafka-go"
 )
 
+var (
+	BROKERS = []string{"localhost:9092"}
+)
+
 const (
 	TOPIC     = "MESSAGE_TOPIC"
 	PARTITION = 0
 )
 
 func main() {
-	conn, err := kafka.DialLeader(context.Background(), "tcp", "localhost:9092", TOPIC, PARTITION)
-	if err != nil {
-		log.Fatal("failed to dial leader:", err)
-	}
+	conn := kafka.NewWriter(kafka.WriterConfig{
+		Brokers:      BROKERS,
+		Topic:        TOPIC,
+		BatchTimeout: time.Millisecond, // Set this to millisecond, because the default is 1 second
+	})
 	defer func() {
 		if err := conn.Close(); err != nil {
 			log.Fatal("failed to close writer:", err)
@@ -26,15 +31,16 @@ func main() {
 	}()
 
 	i := 1
+	ctx := context.Background()
 	for {
-		send(conn, i)
+		send(conn, ctx, i)
 		i++
-		time.Sleep(time.Second * 1)
+		time.Sleep(time.Second)
 	}
 }
 
-func send(conn *kafka.Conn, counter int) {
-	_, err := conn.WriteMessages(
+func send(conn *kafka.Writer, ctx context.Context, counter int) {
+	err := conn.WriteMessages(ctx,
 		kafka.Message{Value: []byte(fmt.Sprintf("MESSAGE %d PUSHED!", counter))},
 	)
 	if err != nil {
