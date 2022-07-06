@@ -40,5 +40,5 @@ func send(conn *kafka.Conn, counter int) {
 	if err != nil {
 		log.Fatal("failed to write messages:", err)
 	}
-	log.Println("Message Sent 🎉")
+	log.Printf("Message Sent %d 🎉\n", counter)
 }
